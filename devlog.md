@@ -52,3 +52,7 @@ using CountDownLatch. I created a static tellerReadyLatch with a count equal to 
 calls countDown() after announcing it's ready, and the main thread waits using tellerReadyLatch.await() before allowing any customers to proceed. 
 After making this change, the issue was resolved, and the bank now correctly waits until all tellers are ready before opening to customers.
 Finally, the bank program is working successfully and ready to submit
+
+# Apr 13 5:15pm
+
+Creating readme.txt file.
