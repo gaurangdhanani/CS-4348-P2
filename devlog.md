@@ -27,15 +27,19 @@ Customers will randomly choose deposit or withdrawal, and tellers will handle th
 the safe with delays. I'll use semaphores or blocking queues to coordinate steps like asking for the transaction, performing it, 
 and signaling completion. All actions, especially waits and resource access, will be logged using the required format to match the project's output rules.
 
-# Apr 13 12:40am
+# Apr 13 12:40pm
 
 For this session, I implemented the full customer-teller transaction flow with proper synchronization using semaphores and blocking queues. 
 Customers randomly choose deposit or withdrawal, enter the bank, select a teller, and complete their transaction. Tellers handle manager 
 and safe access with delays, and all actions are logged in the required format, matching the project's output rules. And done with the second session.
 
-# Apr 13 12:50am
+# Apr 13 12:50pm
 
 For the final session, I'll scale the simulation to 3 tellers and 50 customers. I'll use a shared counter (protected by a lock) 
 to track how many customers have completed their transactions. Once all 50 are done, each teller will print a message indicating 
 they are leaving for the day and exit their loop. After all teller threads finish, the main thread will print "The bank closes for the day."
 I'll ensure all thread synchronization and logging formats remain consistent with the project requirements.	
+
+# Ape 13 2:00pm
+
+In this final session, I scaled the simulation to 3 tellers and 50 customers, implemented full transaction logic with manager and safe access, and added a shutdown mechanism where tellers exit after serving all customers and the bank prints a closing message. While running the code, I encountered an error because `AtomicInteger` was used to track completed customers but wasn’t imported; this was resolved by adding `import java.util.concurrent.atomic.AtomicInteger` at the top of the file. The test was successful.

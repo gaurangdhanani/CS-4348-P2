@@ -1,10 +1,11 @@
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bank {
 
-    static final int NUM_TELLERS = 1;
-    static final int NUM_CUSTOMERS = 3;
+    static final int NUM_TELLERS = 3;
+    static final int NUM_CUSTOMERS = 50;
 
     static Semaphore doorSemaphore = new Semaphore(2);
     static Semaphore managerSemaphore = new Semaphore(1);
@@ -14,13 +15,20 @@ public class Bank {
     static BlockingQueue<Teller> readyTellers = new LinkedBlockingQueue<>();
     static BlockingQueue<CustomerInteraction> customerQueue = new LinkedBlockingQueue<>();
 
+    static AtomicInteger servedCustomers = new AtomicInteger(0);
+    static final Object shutdownLock = new Object();
+
     enum TransactionType {
         DEPOSIT, WITHDRAWAL
     }
 
     public static void main(String[] args) {
+        List<Teller> tellers = new ArrayList<>();
+
         for (int i = 0; i < NUM_TELLERS; i++) {
-            new Teller(i).start();
+            Teller teller = new Teller(i);
+            tellers.add(teller);
+            teller.start();
         }
 
         bankOpen = true;
@@ -28,6 +36,17 @@ public class Bank {
         for (int i = 0; i < NUM_CUSTOMERS; i++) {
             new Customer(i).start();
         }
+
+        // Wait for all tellers to finish
+        for (Teller teller : tellers) {
+            try {
+                teller.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println("The bank closes for the day.");
     }
 
     static class CustomerInteraction {
@@ -56,18 +75,22 @@ public class Bank {
         public void run() {
             try {
                 while (true) {
+                    if (servedCustomers.get() >= NUM_CUSTOMERS) break;
+
                     System.out.println("Teller " + id + " []: ready to serve");
                     System.out.println("Teller " + id + " []: waiting for a customer");
 
                     readyTellers.put(this);
 
-                    CustomerInteraction interaction = customerQueue.take();
+                    CustomerInteraction interaction = customerQueue.poll(100, TimeUnit.MILLISECONDS);
+                    if (interaction == null) continue;
+
                     System.out.println("Teller " + id + " [Customer " + interaction.customerId + "]: serving a customer");
-
                     System.out.println("Teller " + id + " [Customer " + interaction.customerId + "]: asks for transaction");
-                    interaction.transactionRequested.release();
 
+                    interaction.transactionRequested.release();
                     interaction.transactionGiven.acquire();
+
                     System.out.println("Teller " + id + " [Customer " + interaction.customerId + "]: handling " + interaction.type.toString().toLowerCase() + " transaction");
 
                     if (interaction.type == TransactionType.WITHDRAWAL) {
@@ -92,10 +115,15 @@ public class Bank {
                     interaction.customerLeft.acquire();
 
                     safeSemaphore.release();
+
+                    int completed = servedCustomers.incrementAndGet();
+                    if (completed >= NUM_CUSTOMERS) break;
                 }
             } catch (InterruptedException e) {
                 System.out.println("Teller " + id + ": interrupted.");
             }
+
+            System.out.println("Teller " + id + " []: leaving for the day");
         }
     }
 
@@ -142,6 +170,7 @@ public class Bank {
 
                 interaction.customerLeft.release();
                 doorSemaphore.release();
+
             } catch (InterruptedException e) {
                 System.out.println("Customer " + id + ": interrupted.");
             }
