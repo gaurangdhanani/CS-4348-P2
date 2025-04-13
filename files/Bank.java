@@ -11,6 +11,8 @@ public class Bank {
     static Semaphore managerSemaphore = new Semaphore(1);
     static Semaphore safeSemaphore = new Semaphore(2);
     static volatile boolean bankOpen = false;
+    static CountDownLatch tellerReadyLatch = new CountDownLatch(NUM_TELLERS);
+
 
     static BlockingQueue<Teller> readyTellers = new LinkedBlockingQueue<>();
     static BlockingQueue<CustomerInteraction> customerQueue = new LinkedBlockingQueue<>();
@@ -29,6 +31,12 @@ public class Bank {
             Teller teller = new Teller(i);
             tellers.add(teller);
             teller.start();
+        }
+
+        try {
+            tellerReadyLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         bankOpen = true;
@@ -78,6 +86,7 @@ public class Bank {
                     if (servedCustomers.get() >= NUM_CUSTOMERS) break;
 
                     System.out.println("Teller " + id + " []: ready to serve");
+                    tellerReadyLatch.countDown();
                     System.out.println("Teller " + id + " []: waiting for a customer");
 
                     readyTellers.put(this);

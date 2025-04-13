@@ -43,3 +43,12 @@ I'll ensure all thread synchronization and logging formats remain consistent wit
 # Ape 13 2:00pm
 
 In this final session, I scaled the simulation to 3 tellers and 50 customers, implemented full transaction logic with manager and safe access, and added a shutdown mechanism where tellers exit after serving all customers and the bank prints a closing message. While running the code, I encountered an error because `AtomicInteger` was used to track completed customers but wasn’t imported; this was resolved by adding `import java.util.concurrent.atomic.AtomicInteger` at the top of the file. The test was successful.
+
+# Apr 13 5:00pm
+
+I noticed an issue where the bank was opening before all the tellers were ready to serve. This caused customers to enter the bank and 
+try to select a teller who hadn’t yet initialized, leading to unexpected behavior. To fix this, I implemented a synchronization mechanism 
+using CountDownLatch. I created a static tellerReadyLatch with a count equal to the number of tellers (NUM_TELLERS). Each teller thread 
+calls countDown() after announcing it's ready, and the main thread waits using tellerReadyLatch.await() before allowing any customers to proceed. 
+After making this change, the issue was resolved, and the bank now correctly waits until all tellers are ready before opening to customers.
+Finally, the bank program is working successfully and ready to submit
