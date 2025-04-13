@@ -27,8 +27,15 @@ Customers will randomly choose deposit or withdrawal, and tellers will handle th
 the safe with delays. I'll use semaphores or blocking queues to coordinate steps like asking for the transaction, performing it, 
 and signaling completion. All actions, especially waits and resource access, will be logged using the required format to match the project's output rules.
 
-# Apr 13 12:20am
+# Apr 13 12:40am
 
 For this session, I implemented the full customer-teller transaction flow with proper synchronization using semaphores and blocking queues. 
 Customers randomly choose deposit or withdrawal, enter the bank, select a teller, and complete their transaction. Tellers handle manager 
-and safe access with delays, and all actions are logged in the required format, matching the project's output rules. And done with the second session.	
+and safe access with delays, and all actions are logged in the required format, matching the project's output rules. And done with the second session.
+
+# Apr 13 12:50am
+
+For the final session, I'll scale the simulation to 3 tellers and 50 customers. I'll use a shared counter (protected by a lock) 
+to track how many customers have completed their transactions. Once all 50 are done, each teller will print a message indicating 
+they are leaving for the day and exit their loop. After all teller threads finish, the main thread will print "The bank closes for the day."
+I'll ensure all thread synchronization and logging formats remain consistent with the project requirements.	
