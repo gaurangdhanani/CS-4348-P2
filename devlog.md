@@ -19,3 +19,10 @@ I created a single Java file 'Bank.java' with shared semaphores to control acces
 I added basic 'Teller' and 'Customer' thread classes with unique IDs. In this initial version, one teller announces readiness, 
 and a few customers enter the bank, pick an available teller, simulate a brief interaction, and leave. The program ran successfully, 
 confirming that the basic thread creation and synchronization logic works as expected. I am done with the first session.
+
+# Apr 13 11:35am
+
+For the next session, I'll implement the full transaction flow between customers and tellers with proper synchronization and logging. 
+Customers will randomly choose deposit or withdrawal, and tellers will handle the request, accessing the manager (for withdrawals) and 
+the safe with delays. I'll use semaphores or blocking queues to coordinate steps like asking for the transaction, performing it, 
+and signaling completion. All actions, especially waits and resource access, will be logged using the required format to match the project's output rules.
