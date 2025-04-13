@@ -26,3 +26,9 @@ For the next session, I'll implement the full transaction flow between customers
 Customers will randomly choose deposit or withdrawal, and tellers will handle the request, accessing the manager (for withdrawals) and 
 the safe with delays. I'll use semaphores or blocking queues to coordinate steps like asking for the transaction, performing it, 
 and signaling completion. All actions, especially waits and resource access, will be logged using the required format to match the project's output rules.
+
+# Apr 13 12:20am
+
+For this session, I implemented the full customer-teller transaction flow with proper synchronization using semaphores and blocking queues. 
+Customers randomly choose deposit or withdrawal, enter the bank, select a teller, and complete their transaction. Tellers handle manager 
+and safe access with delays, and all actions are logged in the required format, matching the project's output rules. And done with the second session.	
